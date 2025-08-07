@@ -1,0 +1,11 @@
+#!/bin/bash
+
+API_URL="https://pokeapi.co/api/v2/pokemon/pikachu"
+
+curl -s -o data.json "$API_URL"
+
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to fetch data from the API" >> errors.txt
+elif ! jq empty data.json 2>> errors.txt; then
+    echo "Error: Invalid JSON response" >> errors.txt
+fi
