@@ -1,0 +1,5 @@
+Error: Failed to fetch data from the API
+./apiAutomation-0x00: line 9: jq: command not found
+Error: Invalid JSON response
+./apiAutomation-0x00: line 9: jq: command not found
+Error: Invalid JSON response
