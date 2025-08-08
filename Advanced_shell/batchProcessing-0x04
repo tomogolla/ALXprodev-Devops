@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# batchProcessing-0x04
+# Objective: Fetch Pokémon data in parallel using background processes
+
+POKEMONS=("Bulbasaur" "Ivysaur" "Venusaur" "Charmander" "Charmeleon")
+
+echo "Starting parallel data fetch for Pokémon..."
+
+# Loop through Pokémon list
+for POKEMON in "${POKEMONS[@]}"; do
+    # Replace spaces with %20 for URL encoding (not needed here but good practice)
+    NAME=$(echo "$POKEMON" | tr ' ' '%20')
+
+    # Fetch data in the background (&)
+    curl -s "https://pokeapi.co/api/v2/pokemon/${NAME,,}" -o "${POKEMON}.json" &
+done
+
+# Wait for all background jobs to complete
+wait
+
+echo "All Pokémon data fetched successfully!"

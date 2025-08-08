@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+POKEMON_LIST=("pikachu" "charizard" "bulbasaur" "invalidpoke")
+BASE_URL="https://pokeapi.co/api/v2/pokemon"
+MAX_RETRIES=3
+
+for POKEMON in "${POKEMON_LIST[@]}"; do
+    echo "Fetching data for: $POKEMON"
+
+    attempt=1
+    success=false
+
+    while [ $attempt -le $MAX_RETRIES ]; do
+        RESPONSE=$(curl -s -w "%{http_code}" -o temp.json "$BASE_URL/$POKEMON")
+
+        HTTP_CODE=$(tail -n1 <<< "$RESPONSE" | tr -d '\n')
+
+        if [ "$HTTP_CODE" -eq 200 ]; then
+            echo "✅ Success: $POKEMON found."
+            jq '.' temp.json
+            success=true
+            break
+        elif [ "$HTTP_CODE" -eq 404 ]; then
+            echo "❌ Error: $POKEMON not found (invalid name)."
+            break
+        else
+            echo "⚠️ Attempt $attempt failed. Retrying..."
+            sleep 1
+        fi
+
+        attempt=$((attempt + 1))
+    done
+
+    if [ "$success" = false ]; then
+        echo "🚨 Skipping $POKEMON after $MAX_RETRIES failed attempts." >> errors.log
+    fi
+
+    rm -f temp.json
+done
